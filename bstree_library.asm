@@ -66,7 +66,7 @@ bstree_preorder:PUSH BP
                 LDH ECX, 1
                 MOV CX, 4
                 MOV EAX, 1 
-                SYS 1
+                SYS 2
 
                 PUSH [EEX + izq]
                 CALL bstree_preorder
@@ -108,7 +108,7 @@ bstree_inorder: PUSH BP
                 LDH ECX, 1
                 MOV CX, 4
                 MOV EAX, 1 
-                SYS 1
+                SYS 2
 
                 PUSH [EEX + der]
                 CALL bstree_inorder
@@ -151,7 +151,7 @@ bstree_postorder: PUSH BP
                 LDH ECX, 1
                 MOV CX, 4
                 MOV EAX, 1 
-                SYS 1
+                SYS 2
 
                 bstree_postorder_fin: POP EEX
                                     POP EDX
