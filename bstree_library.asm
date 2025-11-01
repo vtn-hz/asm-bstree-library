@@ -1,9 +1,25 @@
-; include mem handling
+\\INCLUDE "alloc25.asm"
 
 size_n EQU 12
 val EQU 0
 izq EQU 4
 der EQU 8
+
+; PUSH < int >
+bstree_create_node: PUSH BP 
+                    MOV BP, SP
+
+                    PUSH size_n
+                    CALL alloc 
+                    ADD SP, 4
+
+                    MOV [EAX+val], [BP+8]
+                    MOV [EAX+izq], null
+                    MOV [EAX+der], null
+
+                    MOV SP, BP
+                    POP BP
+RET
 
 ; PUSH <*node>
 ; PUSH <**root>
@@ -16,16 +32,16 @@ bstree_add:     PUSH BP
                 PUSH ECX
                 PUSH EFX
 
-                MOV EDX, [BP + 8]
+                MOV EDX, [BP+8]
                 MOV ECX, [EDX]
-                MOV EFX, [BP +12]
+                MOV EFX, [BP+12]
 
                 CMP ECX, null
                 JZ bstree_add_insert
-                CMP [ECX + val], [EFX + val]
+                CMP [ECX+val], [EFX+val]
                 JP  bstree_add_goizq
                  
-                bstree_add_goder    ADD ECX, der
+                bstree_add_goder:    ADD ECX, der
                                     PUSH EFX
                                     PUSH ECX
                                     CALL bstree_add
@@ -49,7 +65,7 @@ RET
 ; PUSH <*root>
 ; CALL bstree_preorder
 ; ADD SP, 4
-bstree_preorder:PUSH BP
+bstree_preorder: PUSH BP
                 MOV  BP, SP
 
                 PUSH EAX
@@ -63,20 +79,20 @@ bstree_preorder:PUSH BP
                 JZ bstree_preorder_fin
 
                 MOV EDX, EEX
-                LDH ECX, 1
-                MOV CX, 4
+                LDH ECX, 4
+                MOV CX, 1
                 MOV EAX, 1 
                 SYS 2
 
-                PUSH [EEX + izq]
+                PUSH [EEX+izq]
                 CALL bstree_preorder
                 ADD SP, 4
 
-                PUSH [EEX + der]
+                PUSH [EEX+der]
                 CALL bstree_preorder
                 ADD SP, 4
 
-                bstree_preorder_fin:POP EEX
+                bstree_preorder_fin: POP EEX
                                     POP EDX
                                     POP ECX
                                     POP EAX
@@ -97,10 +113,10 @@ bstree_inorder: PUSH BP
 
                 MOV EEX, [BP+8]
 
-                CMP EEX, null
+                CMP EEX, [null]
                 JZ bstree_inorder_fin
 
-                PUSH [EEX + izq]
+                PUSH [EEX+izq]
                 CALL bstree_inorder
                 ADD SP, 4
 
@@ -110,7 +126,7 @@ bstree_inorder: PUSH BP
                 MOV EAX, 1 
                 SYS 2
 
-                PUSH [EEX + der]
+                PUSH [EEX+der]
                 CALL bstree_inorder
                 ADD SP, 4
 
@@ -139,11 +155,11 @@ bstree_postorder: PUSH BP
                 CMP EEX, null
                 JZ bstree_postorder_fin
 
-                PUSH [EEX + izq]
+                PUSH [EEX+izq]
                 CALL bstree_postorder
                 ADD SP, 4
 
-                PUSH [EEX + der]
+                PUSH [EEX+der]
                 CALL bstree_postorder
                 ADD SP, 4
 
@@ -173,15 +189,15 @@ bstree_find:    PUSH BP
                 PUSH EDX
                 PUSH ECX
 
-                MOV EDX, [BP +12]
-                MOV ECX, [BP +8]
+                MOV EDX, [BP+12]
+                MOV ECX, [BP+8]
 
                 CMP ECX, null
                 JZ bstree_find_notfound
-                CMP [ECX + val], EDX
+                CMP [ECX+val], EDX
                 JZ bstree_find_found
 
-                CMP [ECX + val], EDX
+                CMP [ECX+val], EDX
                 JP  bstree_find_goizq
                  
                 bstree_find_goder:  PUSH EFX
@@ -214,25 +230,25 @@ bstree_niv: PUSH BP
             PUSH EBX
             PUSH EFX
             
-            MOV EFX, [BP + 8]
+            MOV EFX, [BP+8]
             
             CMP EFX, null
             JZ bstree_niv_zero
 
-            PUSH [EFX + izq]
+            PUSH [EFX+izq]
             CALL bstree_niv
             ADD SP, 4
 
             MOV EBX, EAX
 
-            PUSH [EFX + izq]
+            PUSH [EFX+der]
             CALL bstree_niv
             ADD SP, 4
 
             CMP EBX, EAX
             JN bstree_niv_continue
             MOV EAX, EBX
-            bstree_niv_continue:ADD EAX, 1
+            bstree_niv_continue: ADD EAX, 1
                                 JMP bstree_niv_fin
             bstree_niv_zero:    MOV EAX, 0
             bstree_niv_fin:     POP EFX
@@ -240,4 +256,3 @@ bstree_niv: PUSH BP
 MOV SP, BP
 POP BP
 RET
-
